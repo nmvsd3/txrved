@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam with Google Sheets</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+    .question { margin: 20px 0; }
+    label { display: block; margin: 5px 0; }
+    #submitBtn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #result { margin-top: 20px; font-weight: bold; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Student Exam</h1>
+
+    <div class="question">
+      <p>1. What does HTML stand for?</p>
+      <label><input type="radio" name="q1" value="a"> Hyper Text Markup Language</label>
+      <label><input type="radio" name="q1" value="b"> Home Tool Markup Language</label>
+      <label><input type="radio" name="q1" value="c"> Hyperlinks and Text Markup Language</label>
+    </div>
+
+    <div class="question">
+      <p>2. What is CSS used for?</p>
+      <label><input type="radio" name="q2" value="a"> Making coffee</label>
+      <label><input type="radio" name="q2" value="b"> Styling web pages</label>
+      <label><input type="radio" name="q2" value="c"> Data collection</label>
+    </div>
+
+    <button id="submitBtn">Submit</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const submitBtn = document.getElementById("submitBtn");
+    const resultDiv = document.getElementById("result");
+
+    function submitExam() {
+      let score = 0;
+      if (document.querySelector("input[name='q1']:checked")?.value === "a") score++;
+      if (document.querySelector("input[name='q2']:checked")?.value === "b") score++;
+
+      const studentName = prompt("Enter your name:");
+      const studentId = prompt("Enter your student ID:");
+
+      if (studentName && studentId) {
+        const formData = new FormData();
+        formData.append("Student Name", studentName);
+        formData.append("Student ID", studentId);
+        formData.append("Score", `${score}/2`);
+
+        fetch("https://script.google.com/macros/s/AKfycbzkSjZNQPnmvwm5qXz9CKnm5Q9PXuIGQU2zIMToxOSGqbC-cV40TAXLtJAfmst3yenCmg/exec", {
+          method: "POST",
+          body: formData
+        })
+        .then(res => res.text())
+        .then(data => {
+          resultDiv.textContent = `You scored ${score}/2. Result saved.`;
+          submitBtn.disabled = true;
+        })
+        .catch(err => {
+          resultDiv.textContent = "Failed to submit result.";
+          console.error(err);
+        });
+      } else {
+        alert("Name and ID are required to submit.");
+      }
+    }
+
+    submitBtn.addEventListener("click", submitExam);
+  </script>
+</body>
+</html>
